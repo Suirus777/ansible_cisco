@@ -1,0 +1,61 @@
+---
+- name: Automatic backup of running config
+  hosts: shut
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: displaythe running config
+      ios_command:
+        commands:
+          - show running-config
+      register: config
+
+    - name: Save output to ./backups/
+      copy:
+        content: "{{config.stdout[0]}}"
+        dest: "backups/show_run{{inventory_hostname}}"
+
+    - name: Cleaning of config cisco from old switch
+      become: yes
+      ios_config:
+        lines:
+          - no aaa authentication login default local
+          - no aaa authorization config-commands
+          - no aaa accounting send stop-record authentication failure
+          - no aaa authorization console
+          - no ntp server 10.125.1.169
+          - no ntp server 10.135.1.169
+          - no ntp server 10.135.1.2
+          - no ip access-list extended shield
+          - no ip domain-name domain.com
+          - no ip name-server 10.22.1.25
+          - no ip name-server 10.125.0.125
+          - no ip access-list standard SNMP-LIMIT
+          - no logging origin-id hostname
+          - no logging facility daemon
+          - no logging snmp-trap emergencies
+          - no logging snmp-trap alerts
+          - no logging snmp-trap critical
+          - no logging snmp-trap errors
+          - no logging snmp-trap warnings
+          - no logging host 10.1.41.22 session-id hostname
+          - no logging host 10.1.41.38 session-id hostname
+          - no snmp-server group SNMP v3 priv read ALL-VIEW access SNMP-LIMIT
+          - no snmp-server view ALL-VIEW iso included
+          - no snmp-server community test_rw RW
+          - no snmp-server location test RU
+          - no snmp-server contact ITS
+          - no snmp-server enable traps snmp authentication linkdown linkup coldstart warmstart
+          - no snmp-server enable traps transceiver all
+          - no snmp-server enable traps call-home message-send-fail server-fail
+          - no snmp-server enable traps tty
+          - no snmp-server enable traps license
+          - no snmp-server enable traps auth-framework sec-violation
+          - no snmp-server enable traps config-copy
+          - no snmp-server enable traps config
+          - no snmp-server enable traps config-ctid
+          - no snmp-server enable traps trustsec-sxp conn-srcaddr-err msg-parse-err conn-config-err binding-err conn-up conn-down binding-expn-fail oper-nodeid-change binding-conflict
+          - no snmp-server enable traps energywise
+          - no snmp-server enable traps fru-ctrl
+          - no snmp-server enable traps entity
