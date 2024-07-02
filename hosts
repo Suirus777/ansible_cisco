@@ -1,0 +1,28 @@
+[cisco]
+host1 ansible_host=10.22.1.99
+host2 ansible_host=10.22.1.100
+host3 ansible_host=10.22.1.101
+host4 ansible_host=10.22.1.102
+host5 ansible_host=10.22.1.103
+host6 ansible_host=10.22.1.13
+host7 ansible_host=10.22.1.98
+host8 ansible_host=10.22.1.97
+host9 ansible_host=10.22.1.90
+host10 ansible_host=10.22.1.91
+host11 ansible_host=10.22.1.92
+host12 ansible_host=10.22.1.93
+host13 ansible_host=10.22.1.94
+host14 ansible_host=10.22.1.95
+host15 ansible_host=10.22.1.4
+host16 ansible_host=10.22.1.88
+host17 ansible_host=10.22.1.89
+host18 ansible_host=10.22.1.87
+
+[test]
+host19 ansible_host=10.22.1.115
+
+[all:vars]
+ansible_connection=network_cli
+ansible_user=cisco
+ansible_password=cisco
+ansible_network_os=ios
