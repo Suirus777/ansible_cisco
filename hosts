@@ -1,4 +1,4 @@
-[cisco]
+[shut]
 host1 ansible_host=10.22.1.99
 host2 ansible_host=10.22.1.100
 host3 ansible_host=10.22.1.101
