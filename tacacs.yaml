@@ -1,0 +1,50 @@
+---
+- name: Automatic backup of running config
+  hosts: test
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: displaythe running config
+      ios_command:
+        commands:
+          - show running-config
+      register: config
+
+    - name: Save output to ./backups/
+      copy:
+        content: "{{config.stdout[0]}}"
+        dest: "backups/tacacs+{{inventory_hostname}}"
+
+    - name: Add all AAA config for Tacacs+ authorization
+      become: yes
+      ios_config:
+        lines:
+          - aaa authentication login admins group admins local
+          - aaa authorization console
+          - aaa authorization config-commands
+          - aaa authorization exec admins group admins local
+          - aaa authorization commands 15 admins group admins local
+          - aaa accounting send stop-record authentication failure
+          - aaa accounting update newinfo
+          - aaa accounting exec default start-stop group admins
+          - aaa accounting commands 0 default start-stop group admins
+          - aaa accounting commands 15 default start-stop group admins
+          - ip tacacs source-interface Vlan300
+
+    - name: Add to VTY config for Tacaca+ authorization
+      become: yes
+      ios_config:
+        lines:
+          - line vty 0 4
+          - authorization commands 15 admins
+          - authorization exec admins
+          - accounting commands 15 admins
+          - login authentication admins
+
+    - name: Add Tacacs+ server
+      become: yes
+      ios_config:
+        lines:
+          - aaa group server tacacs+ admins
+          - server-private 192.16.1.155 single-connection key "Tacacs_key"
