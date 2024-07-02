@@ -1,0 +1,34 @@
+
+---
+- name: Automatic backup of running config
+  hosts: test
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: displaythe running config
+      ios_command:
+        commands:
+          - show running-config
+      register: config
+
+    - name: Save output to ./backups/
+      copy:
+        content: "{{config.stdout[0]}}"
+        dest: "backups/VLAN{{inventory_hostname}}"
+
+    - name: add new vlans 998\999
+      become: yes
+      ios_config:
+        lines:
+          - Vlan 998
+          - name Managment
+          - interface Vlan998
+          - description Managment
+          - no shutdown
+          - ip address 192.168.1.155 255.255.255.0
+          - Vlan 999
+          - name Servers
+          - interface Vlan999
+          - description Servers
+          - no shutdown
